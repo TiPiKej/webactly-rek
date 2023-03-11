@@ -1,33 +1,25 @@
-import { Controller, Param, Body, Get, Post, Put, Delete } from 'routing-controllers';
+import { Param, Body, Get, Post, Put, Delete, QueryParams, JsonController, QueryParam, Params } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi/build/decorators';
+import { Service } from 'typedi';
+import { CoordinateParameters, RainingResponse } from '../models';
+import { WeatherService } from '../services';
 
-@Controller()
+@JsonController()
+@Service()
 export class WeatherController {
+    constructor(
+        private readonly weatherService: WeatherService,
+    ) { }
+
     @OpenAPI({
-        description: 'Create a new user'
+        description: 'Check if is raining',
+        parameters: [
+            { name: "lat", example: 50.06143, in: "query", description: "Decimal degrees latitude" },
+            { name: "lon", example: 19.93658, in: "query", description: "Decimal degrees longitude" }
+        ]
     })
-    @Get('/users')
-    getAll() {
-        return 'This action returns all users';
-    }
-
-    @Get('/users/:id')
-    getOne(@Param('id') id: number) {
-        return 'This action returns user #' + id;
-    }
-
-    @Post('/users')
-    post(@Body() user: any) {
-        return 'Saving user...';
-    }
-
-    @Put('/users/:id')
-    put(@Param('id') id: number, @Body() user: any) {
-        return 'Updating a user...';
-    }
-
-    @Delete('/users/:id')
-    remove(@Param('id') id: number) {
-        return 'Removing user...';
+    @Get('/isitraining')
+    async getAll(@QueryParams() coords: CoordinateParameters): Promise<RainingResponse | undefined> {
+        return this.weatherService.getCurrentRainInfo(coords);
     }
 }
