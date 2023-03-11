@@ -17,6 +17,7 @@ class WeatherService {
             return data;
         } catch (error) {
             console.log("error: ", error)
+            // TODO obsluga bledow
             if (axios.isAxiosError(error)) {
                 // handleAxiosError(error);
                 console.log('axios error')
@@ -29,7 +30,7 @@ class WeatherService {
         return;
     }
 
-    async getCurrentRainInfo(coords: CoordinateParameters): Promise<RainingResponse | undefined> {
+    async getRainInfo(coords: CoordinateParameters): Promise<RainingResponse | undefined> {
         const data = await this.getCurrentWeather(coords);
         const { rain } = data.current;
 
