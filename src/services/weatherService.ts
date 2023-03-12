@@ -1,4 +1,5 @@
 import axios from "axios";
+import { NotFoundError } from "routing-controllers";
 import { Service } from "typedi";
 import { CoordinateParameters, RainingResponse, WeatherResponse } from "../models";
 import { weatherUrl } from './api-endpoints';
@@ -16,22 +17,14 @@ class WeatherService {
             const { data } = await axios.get(weatherUrl(coords.lat, coords.lon, this.apiKey));
             return data;
         } catch (error) {
-            console.log("error: ", error)
-            // TODO obsluga bledow
-            if (axios.isAxiosError(error)) {
-                // handleAxiosError(error);
-                console.log('axios error')
-            } else {
-                // handleUnexpectedError(error);
-                console.log('unexpected error')
-            }
+            throw new NotFoundError("Couldn't fetch weather data");
         }
-
-        return;
     }
 
     async getRainInfo(coords: CoordinateParameters): Promise<RainingResponse | undefined> {
         const data = await this.getCurrentWeather(coords);
+        if (!data) return;
+        
         const { rain } = data.current;
 
         if (!rain) return {

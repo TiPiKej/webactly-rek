@@ -41,5 +41,3 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(spec));
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
 });
-
-// TODO dodac readme

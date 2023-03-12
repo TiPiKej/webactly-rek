@@ -1,6 +1,7 @@
 import axios from "axios";
+import { NotFoundError } from "routing-controllers";
 import { Service } from "typedi";
-import { ActivityResponse, CoordinateParameters } from "../models";
+import { ActivityResponse, ActivityShortResponse, CoordinateParameters } from "../models";
 import { activityUrl } from "./api-endpoints";
 import WeatherService from "./weatherService";
 
@@ -10,7 +11,16 @@ class ActivityService {
         private readonly weatherService: WeatherService,
     ) {}
 
-    async getCurrentActivity(coords: CoordinateParameters): Promise<ActivityResponse | undefined> {
+    async fetchActivity(category: string): Promise<ActivityResponse> {
+        try {
+            const { data } = await axios.get(activityUrl(category));
+            return data;
+        } catch (error) {
+            throw new NotFoundError("Couldn't fetch activity data");
+        }
+    }
+
+    async getCurrentActivity(coords: CoordinateParameters): Promise<ActivityShortResponse | undefined> {
         const rainInfo = await this.weatherService.getRainInfo(coords);
 
         const categories: string[] = rainInfo.isRaining ? (
@@ -19,25 +29,9 @@ class ActivityService {
             [ "recreational", "social", "relaxation" ]
         )
 
-        const drawnCategory = categories[this.random(0, categories.length)]
-        console.log(drawnCategory)
+        const { activity, type } = await this.fetchActivity(categories[this.random(0, categories.length)]);
 
-        try {
-            const { data } = await axios.get(activityUrl(drawnCategory));
-            return data;
-        } catch (error) {
-            console.log("error: ", error)
-            // TODO obsluga bledow
-            if (axios.isAxiosError(error)) {
-                // handleAxiosError(error);
-                console.log('axios error')
-            } else {
-                // handleUnexpectedError(error);
-                console.log('unexpected error')
-            }
-        }
-        
-        return;
+        return { activity, type };
     }
 
     random(min: number, max: number): number {

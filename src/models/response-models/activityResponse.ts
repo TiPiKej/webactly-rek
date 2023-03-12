@@ -29,3 +29,11 @@ export class ActivityResponse {
     @Length(5, 10)
     key: string;
 }
+
+export class ActivityShortResponse {
+    @IsString()
+    activity: string;
+
+    @IsIn(["education", "recreational", "social", "diy", "charity", "cooking", "relaxation", "music", "busywork"])
+    type: ActivityTypes;
+}

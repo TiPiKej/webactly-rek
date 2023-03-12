@@ -1,7 +1,7 @@
-import { Param, Body, Get, Post, Put, Delete, QueryParams, JsonController, QueryParam, Params } from 'routing-controllers';
-import { OpenAPI } from 'routing-controllers-openapi/build/decorators';
+import { Get, QueryParams, JsonController } from 'routing-controllers';
+import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi/build/decorators';
 import { Service } from 'typedi';
-import { ActivityResponse, CoordinateParameters, RainingResponse } from '../models';
+import { ActivityShortResponse, CoordinateParameters, RainingResponse } from '../models';
 import { WeatherService } from '../services';
 import ActivityService from '../services/activityService';
 
@@ -20,6 +20,7 @@ export class WeatherController {
             { name: "lon", example: 19.93658, in: "query", description: "Decimal degrees longitude" }
         ]
     })
+    @ResponseSchema(RainingResponse)
     @Get('/isitraining')
     async getRainingInfo(@QueryParams() coords: CoordinateParameters): Promise<RainingResponse | undefined> {
         return this.weatherService.getRainInfo(coords);
@@ -32,8 +33,9 @@ export class WeatherController {
             { name: "lon", example: 19.93658, in: "query", description: "Decimal degrees longitude" }
         ]
     })
+    @ResponseSchema(ActivityShortResponse)
     @Get('/whattodo')
-    async getActivityInfo(@QueryParams() coords: CoordinateParameters): Promise<ActivityResponse | undefined> {
+    async getActivityInfo(@QueryParams() coords: CoordinateParameters): Promise<ActivityShortResponse | undefined> {
         return this.activityService.getCurrentActivity(coords);
     }
 }
